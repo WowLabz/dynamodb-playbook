@@ -1,0 +1,87 @@
+flowchart TB
+  %% Styles
+  classDef base fill:#ecfdf5,stroke:#10b981,rx:6,ry:6,color:#064e3b;
+  classDef gsi  fill:#fff7ed,stroke:#fb923c,rx:6,ry:6,color:#7c2d12;
+  classDef item fill:#f8fafc,stroke:#94a3b8,rx:6,ry:6,color:#334155;
+  classDef rule fill:#eff6ff,stroke:#60a5fa,rx:6,ry:6,color:#0c4a6e;
+  classDef misc fill:#fefce8,stroke:#eab308,rx:6,ry:6,color:#713f12;
+
+  subgraph BASE["Base Table Keys"]
+    BPK["PK formats:
+• USER#<user_id>
+• POST#<post_id>
+• FOLLOWEE#<user_id>"]:::base
+    BSK["SK formats:
+• META
+• COMMENT#<comment_id>
+• LIKE#<user_id>
+• TAG#<tag>
+• FOLLOWER#<user_id>#<ts>"]:::base
+  end
+
+  subgraph GSIs["Global Secondary Indexes"]
+    G1["GSI1 PostsByAuthor
+PK: USER#<author_id>
+SK: <ts>#POST#<post_id>  (DESC)"]:::gsi
+    G2["GSI2 PostsByTag
+PK: TAG#<tag>
+SK: <ts>#POST#<post_id>  (DESC)"]:::gsi
+    G3["GSI3 FeedByUser
+PK: FEED#<user_id>
+SK: <ts>#<shard>#POST#<post_id>  (DESC)"]:::gsi
+    G4["GSI_FOL Followers
+PK: FOLLOWEE#<user_id>
+SK: <ts>#FOLLOWER#<follower_id>"]:::gsi
+    G5["GSI_NOTIF Unread
+PK: USER#<user_id>#UNREAD
+SK: <ts>#<notif_id>"]:::gsi
+  end
+
+  subgraph ITEMS["Item Types & SK prefixes"]
+    UU["User
+PK=USER#id, SK=META"]:::item
+    UP["Post (meta)
+PK=POST#id, SK=META"]:::item
+    UC["Comment
+PK=POST#id, SK=COMMENT#<id>"]:::item
+    UL["Like
+PK=POST#id, SK=LIKE#<user_id>"]:::item
+    UT["Post Tag
+PK=POST#id, SK=TAG#<tag>"]:::item
+    UF["Follow Edge
+PK=FOLLOWEE#user, SK=FOLLOWER#follower#<ts>"]:::item
+    UN["Notification (Unread)
+PK=USER#id#UNREAD, SK=<ts>#<notif_id>"]:::item
+  end
+
+  subgraph RULES["Write Rules / Idempotency / Ordering"]
+    R1["Create Post:
+PutItem IF attribute_not_exists(PK) AND attribute_not_exists(SK)"]:::rule
+    R2["Add Like:
+PutItem IF attribute_not_exists(SK) (idempotent)"]:::rule
+    R3["Add Comment:
+PutItem IF attribute_not_exists(SK) (idempotent by comment_id)"]:::rule
+    R4["Fanout → Feed:
+PutItem to GSI3 partition(s) with sharded SK"]:::rule
+    R5["Follow:
+PutItem IF attribute_not_exists(SK)"]:::rule
+  end
+
+  subgraph MISC["TTL / Streams / Sharding / Projection"]
+    T1["TTL:
+• ephemeral notifications (read true → move or delete)
+• temporary fanout artifacts"]:::misc
+    T2["Streams:
+• Build fanout / notifications
+• Metrics (top authors, tag velocity)"]:::misc
+    T3["Sharding:
+• home feed SK: <ts>#<shard>#POST#<id>"]:::misc
+    T4["Projection:
+• minimal INCLUDE on GSIs to keep RCU low"]:::misc
+  end
+
+  %% Link the sections
+  BPK --> BSK
+  GSIs --> ITEMS
+  ITEMS --> RULES
+  RULES --> MISC

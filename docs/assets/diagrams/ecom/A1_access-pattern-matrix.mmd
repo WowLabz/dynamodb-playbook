@@ -1,0 +1,58 @@
+---
+config:
+  layout: dagre
+---
+flowchart LR
+ subgraph SVC["Consumers / Services"]
+        U1["ECOM-001 UserSvc<br>Get User"]
+        O2["ECOM-002 OrderSvc<br>List Orders by User"]
+        O3["ECOM-003 OrderSvc<br>Get Order"]
+        O4["ECOM-004 OrderSvc<br>List OrderLines"]
+        B5["ECOM-005 Backoffice<br>Orders by Status/Month"]
+        P6["ECOM-006 PaymentSvc<br>Get Payments (by Order)"]
+        P7["ECOM-007 PaymentSvc<br>Find Pending"]
+        S8["ECOM-008 ShipmentSvc<br>Get Shipments (by Order)"]
+        I9["ECOM-009 InventorySvc<br>Reserve/Decrement"]
+        OP10["ECOM-010 Ops<br>Orders Dashboard (status+carrier)"]
+        AR11["ECOM-011 Archive<br>Export Old Orders"]
+  end
+ subgraph PATHS["Physical Access Paths"]
+        B0["BASE TABLE<br>PK+SK"]
+        G1["GSI1 OrdersByUser<br>PK: USER#&lt;id&gt;<br>SK: &lt;ts&gt;#ORDER#&lt;id&gt;"]
+        G2["GSI2 OrdersByStatus<br>PK: STATUS#&lt;status&gt;#&lt;yyyy-mm&gt;<br>SK: &lt;ts&gt;#&lt;shard&gt;#ORDER#&lt;id&gt;"]
+        GP["GSI_PAY Pending<br>PK: PAYSTATUS#&lt;status&gt;<br>SK: &lt;attempted_at&gt;#ORDER#&lt;id&gt;"]
+        GS["GSI_SHIP Ops slice<br>PK: SHIP#&lt;status&gt;#&lt;carrier&gt;#&lt;yyyy-mm&gt;<br>SK: &lt;updated_at&gt;#ORDER#&lt;id&gt;"]
+        OFF["Offline / Analytics<br>Export-to-S3 • Athena/Glue"]
+  end
+    U1 -- "GetItem<br>PK=USER#id, SK=META" --> B0
+    O2 -- "Query<br>GSI1PK=USER#id<br>DESC" --> G1
+    O3 -- "GetItem<br>PK=ORDER#id, SK=META" --> B0
+    O4 -- "Query<br>PK=ORDER#id + begins_with(SK,'LINE#')<br>ASC" --> B0
+    B5 -- "Query<br>GSI2PK=STATUS#S#YYYY-MM<br>DESC" --> G2
+    P6 -- "Query<br>PK=ORDER#id + begins_with(SK,'PAYMENT#')<br>DESC" --> B0
+    P7 -- Query<br>PAYSTATUS#Pending<br>ASC --> GP
+    S8 -- "Query<br>PK=ORDER#id + begins_with(SK,'SHIPMENT#')<br>DESC" --> B0
+    I9 -- "UpdateItem + Condition<br>PK=PRODUCT#id, SK=META" --> B0
+    OP10 -- Query (ops slice)<br>status+carrier+month --> GS
+    AR11 -- Periodic export --> OFF
+     U1:::base
+     O2:::gsi
+     O3:::base
+     O4:::base
+     B5:::gsi
+     P6:::base
+     P7:::gsi
+     S8:::base
+     I9:::wr
+     OP10:::gsi
+     AR11:::off
+     B0:::base
+     G1:::gsi
+     G2:::gsi
+     GP:::gsi
+     GS:::gsi
+     OFF:::off
+    classDef base fill:#ecfdf5,stroke:#10b981,color:#064e3b
+    classDef gsi fill:#fff7ed,stroke:#fb923c,color:#7c2d12
+    classDef wr fill:#eff6ff,stroke:#60a5fa,color:#0c4a6e
+    classDef off fill:#f8fafc,stroke:#94a3b8,color:#334155,stroke-dasharray:4 3

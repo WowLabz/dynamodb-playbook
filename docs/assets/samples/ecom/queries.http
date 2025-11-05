@@ -1,82 +1,136 @@
 ### PARAMETERS
-# REGION: ap-south-1
-# TABLE: PlaybookEcom
-# GSI1: GSI1_OrdersByUser
-# GSI2: GSI2_OrdersByStatus
+@REGION = ap-south-1
+@TABLE  = PlaybookEcom
+@GSI1   = GSI1_OrdersByUser
+@GSI2   = GSI2_OrdersByStatus
 
 # E-COMMERCE — DynamoDB Query Samples (.http)
 
 ### 1) Get User by id (STRONG)
-POST https://dynamodb.ap-south-1.amazonaws.com/
+POST https://dynamodb.{{REGION}}.amazonaws.com/
 X-Amz-Target: DynamoDB_20120810.GetItem
 Content-Type: application/x-amz-json-1.0
 
 {
-  "TableName": "PlaybookEcom",
-  "Key": {"PK": {"S": "USER#U100"}, "SK": {"S": "META"}},
-  "ConsistentRead": true
+  "TableName": "{{TABLE}}",
+  "Key": {
+    "PK": {"S": "USER#U100"},
+    "SK": {"S": "META"}
+  },
+  "ConsistentRead": true,
+  "ReturnConsumedCapacity": "TOTAL"
 }
 
 ### 2) Get Order (STRONG)
-POST https://dynamodb.ap-south-1.amazonaws.com/
+POST https://dynamodb.{{REGION}}.amazonaws.com/
 X-Amz-Target: DynamoDB_20120810.GetItem
 Content-Type: application/x-amz-json-1.0
 
 {
-  "TableName": "PlaybookEcom",
-  "Key": {"PK": {"S": "ORDER#12345"}, "SK": {"S": "META"}},
-  "ConsistentRead": true
+  "TableName": "{{TABLE}}",
+  "Key": {
+    "PK": {"S": "ORDER#12345"},
+    "SK": {"S": "META"}
+  },
+  "ConsistentRead": true,
+  "ReturnConsumedCapacity": "TOTAL"
 }
 
 ### 3) Orders by User (GSI1), recent-first
-POST https://dynamodb.ap-south-1.amazonaws.com/
+# GSI1SK looks like: 2025-11-04T10:00:00Z#ORDER#12345
+POST https://dynamodb.{{REGION}}.amazonaws.com/
 X-Amz-Target: DynamoDB_20120810.Query
 Content-Type: application/x-amz-json-1.0
 
 {
-  "TableName": "PlaybookEcom",
-  "IndexName": "GSI1_OrdersByUser",
+  "TableName": "{{TABLE}}",
+  "IndexName": "{{GSI1}}",
   "KeyConditionExpression": "GSI1PK = :u AND begins_with(GSI1SK, :tsPrefix)",
-  "ExpressionAttributeValues": {":u": {"S": "USER#U100"}, ":tsPrefix": {"S": "2025-"}},
+  "ExpressionAttributeValues": {
+    ":u": {"S": "USER#U100"},
+    ":tsPrefix": {"S": "2025-"}
+  },
   "ScanIndexForward": false,
-  "Limit": 25
+  "Limit": 25,
+  "ReturnConsumedCapacity": "TOTAL"
 }
 
-### 4) Backoffice Orders by Status/Month (GSI2), paginated
-POST https://dynamodb.ap-south-1.amazonaws.com/
+### 4) Backoffice Orders by Status/Month (GSI2)
+# GSI2PK: STATUS#<Status>#<YYYY-MM>
+# GSI2SK: <ts>#<shard>#ORDER#<id> (optional sharding)
+POST https://dynamodb.{{REGION}}.amazonaws.com/
 X-Amz-Target: DynamoDB_20120810.Query
 Content-Type: application/x-amz-json-1.0
 
 {
-  "TableName": "PlaybookEcom",
-  "IndexName": "GSI2_OrdersByStatus",
+  "TableName": "{{TABLE}}",
+  "IndexName": "{{GSI2}}",
   "KeyConditionExpression": "GSI2PK = :pk",
-  "ExpressionAttributeValues": {":pk": {"S": "STATUS#Shipped#2025-11"}},
+  "ExpressionAttributeValues": {
+    ":pk": {"S": "STATUS#Shipped#2025-11"}
+  },
   "ScanIndexForward": false,
-  "Limit": 200
+  "Limit": 200,
+  "ReturnConsumedCapacity": "TOTAL"
+}
+
+### 4a) (Optional) GSI2 pagination — continue with LastEvaluatedKey
+POST https://dynamodb.{{REGION}}.amazonaws.com/
+X-Amz-Target: DynamoDB_20120810.Query
+Content-Type: application/x-amz-json-1.0
+
+{
+  "TableName": "{{TABLE}}",
+  "IndexName": "{{GSI2}}",
+  "KeyConditionExpression": "GSI2PK = :pk",
+  "ExpressionAttributeValues": {
+    ":pk": {"S": "STATUS#Shipped#2025-11"}
+  },
+  "ScanIndexForward": false,
+  "Limit": 200,
+  "ExclusiveStartKey": {
+    "GSI2PK": {"S": "STATUS#Shipped#2025-11"},
+    "GSI2SK": {"S": "2025-11-04T10:00:00Z#02#ORDER#12345"},
+    "PK":     {"S": "ORDER#12345"},
+    "SK":     {"S": "META"}
+  },
+  "ReturnConsumedCapacity": "TOTAL"
 }
 
 ### 5) Conditional inventory decrement
-POST https://dynamodb.ap-south-1.amazonaws.com/
+POST https://dynamodb.{{REGION}}.amazonaws.com/
 X-Amz-Target: DynamoDB_20120810.UpdateItem
 Content-Type: application/x-amz-json-1.0
 
 {
-  "TableName": "PlaybookEcom",
-  "Key": {"PK": {"S": "PRODUCT#P-RED-TSHIRT"}, "SK": {"S": "META"}},
+  "TableName": "{{TABLE}}",
+  "Key": {
+    "PK": {"S": "PRODUCT#P-RED-TSHIRT"},
+    "SK": {"S": "META"}
+  },
   "UpdateExpression": "SET available = available - :q",
   "ConditionExpression": "available >= :q",
-  "ExpressionAttributeValues": {":q": {"N": "1"}},
-  "ReturnValues": "ALL_NEW"
+  "ExpressionAttributeValues": {
+    ":q": {"N": "1"}
+  },
+  "ReturnValues": "ALL_NEW",
+  "ReturnConsumedCapacity": "TOTAL"
 }
 
-### 6) Idempotent payment auth (PutItem with condition)
-POST https://dynamodb.ap-south-1.amazonaws.com/
+### 6) Idempotent payment auth (conditional Put)
+POST https://dynamodb.{{REGION}}.amazonaws.com/
 X-Amz-Target: DynamoDB_20120810.PutItem
 Content-Type: application/x-amz-json-1.0
 
 {
-  "TableName": "PlaybookEcom",
-  "Item": {"PK": {"S":"ORDER#12345"}, "SK": {"S":"PAYMENT#2025-11-04T10:00:05Z"}, "status": {"S":"Authorized"}, "amount_cents": {"N":"12999"}},
-  "ConditionExpression": "attribute_not_exists(PK) AND attribute_not_exists(SK)"
+  "TableName": "{{TABLE}}",
+  "Item": {
+    "PK": {"S":"ORDER#12345"},
+    "SK": {"S":"PAYMENT#2025-11-04T10:00:05Z"},
+    "status": {"S":"Authorized"},
+    "amount_cents": {"N":"12999"},
+    "method": {"S":"CARD"}
+  },
+  "ConditionExpression": "attribute_not_exists(PK) AND attribute_not_exists(SK)",
+  "ReturnConsumedCapacity": "TOTAL"
 }

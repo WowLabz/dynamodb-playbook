@@ -1,0 +1,5 @@
+flowchart LR
+  classDef c fill:#f0fdf4,stroke:#22c55e,rx:6,ry:6;
+  KMS["KMS CMK<br/>Key policy & rotation"]:::c --> DDB["DynamoDB Table<br/>Encryption at rest"]:::c
+  IAM["IAM Policies<br/>Least privilege + tenant prefix conditions"]:::c --> APP["App Clients"]:::c
+  VPC["VPC Endpoints / TLS"]:::c --> DDB

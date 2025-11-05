@@ -1,0 +1,56 @@
+flowchart LR
+ subgraph SVC["Consumers / Services"]
+        U1["FEED-001 UserSvc<br>Get User"]
+        P2["FEED-002 PostSvc<br>List Posts"]
+        F3["FEED-003 FeedSvc<br>Get Home Feed"]
+        P4["FEED-004 PostSvc<br>Get Post"]
+        E5["FEED-005 EngageSvc<br>List Likes"]
+        E6["FEED-006 EngageSvc<br>List Comments"]
+        S7["FEED-007 SearchSvc<br>Posts by Tag"]
+        G8["FEED-008 GraphSvc<br>Followers of"]
+        N9["FEED-009 NotifySvc<br>Notifications (unread)"]
+        O10["FEED-010 Ops<br>Top Authors (period)"]
+  end
+ subgraph PATHS["Physical Access Paths"]
+        B0["BASE TABLE<br>PK+SK"]
+        G1["GSI1 PostsByAuthor<br>PK: USER#&lt;author&gt;<br>SK: &lt;ts&gt;#POST#&lt;id&gt;"]
+        G2["GSI2 PostsByTag<br>PK: TAG#&lt;tag&gt;<br>SK: &lt;ts&gt;#POST#&lt;id&gt;"]
+        G3["GSI3 FeedByUser<br>PK: FEED#&lt;user&gt;<br>SK: &lt;ts&gt;#&lt;shard&gt;#POST#&lt;id&gt;"]
+        GF["GSI_FOL Followers<br>PK: FOLLOWEE#&lt;user&gt;<br>SK: &lt;ts&gt;#FOLLOWER#&lt;id&gt;"]
+        GN["GSI_NOTIF Unread<br>PK: USER#&lt;id&gt;#UNREAD<br>SK: &lt;ts&gt;#&lt;notif&gt;"]
+        M1["Metrics / Leaderboard<br>(precomputed via Streams→Lambda)"]
+  end
+    U1 -- "GetItem<br>PK=USER#id, SK=META" --> B0
+    P2 -- "Query<br>GSI1PK=USER#author<br>DESC" --> G1
+    F3 -- "Query<br>GSI3PK=FEED#user<br>DESC" --> G3
+    P4 -- "GetItem<br>PK=POST#id, SK=META" --> B0
+    E5 -- "Query<br>PK=POST#id + begins_with(SK,'LIKE#')<br>DESC" --> B0
+    E6 -- "Query<br>PK=POST#id + begins_with(SK,'COMMENT#')<br>ASC" --> B0
+    S7 -- "Query<br>GSI2PK=TAG#tag<br>DESC" --> G2
+    G8 -- "Query<br>PK=FOLLOWEE#user<br>DESC" --> GF
+    N9 -- "Query<br>PK=USER#id#UNREAD<br>DESC" --> GN
+    O10 -- Read<br>Top N by month --> M1
+
+     U1:::base
+     P2:::gsi
+     F3:::gsi
+     P4:::base
+     E5:::base
+     E6:::base
+     S7:::gsi
+     G8:::gsi
+     N9:::gsi
+     O10:::off
+     B0:::base
+     G1:::gsi
+     G2:::gsi
+     G3:::gsi
+     GF:::gsi
+     GN:::gsi
+     M1:::off
+    classDef base fill:#ecfdf5,stroke:#10b981,color:#064e3b
+    classDef gsi fill:#fff7ed,stroke:#fb923c,color:#7c2d12
+    classDef wr fill:#eff6ff,stroke:#60a5fa,color:#0c4a6e
+    classDef off fill:#f8fafc,stroke:#94a3b8,color:#334155,stroke-dasharray:4 3
+
+

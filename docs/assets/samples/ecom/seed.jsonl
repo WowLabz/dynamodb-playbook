@@ -4,4 +4,4 @@
 {"PK": "ORDER#12345", "SK": "PAYMENT#2025-11-04T10:00:05Z", "status": "Authorized", "amount_cents": 12999, "method": "CARD"}
 {"PK": "ORDER#12345", "SK": "SHIPMENT#2025-11-04T18:10:00Z", "carrier": "DHL", "tracking_no": "DHL-999", "status": "LabelCreated"}
 {"GSI1PK": "USER#U100", "GSI1SK": "2025-11-04T10:00:00Z#ORDER#12345"}
-{"GSI2PK": "STATUS#Placed#2025-11", "GSI2SK": "2025-11-04T10:00:00Z#ORDER#12345"}
+{"GSI2PK": "STATUS#Placed#2025-11", "GSI2SK": "2025-11-04T10:00:00Z#02#ORDER#12345"}

@@ -1,72 +1,113 @@
 ### PARAMETERS
-# REGION: ap-south-1
-# TABLE: PlaybookFeed
-# GSI1: GSI1_PostsByAuthor
-# GSI2: GSI2_PostsByTag
-# GSI3: GSI3_FeedByUser
+@REGION = ap-south-1
+@TABLE  = PlaybookFeed
+@GSI1   = GSI1_PostsByAuthor
+@GSI2   = GSI2_PostsByTag
+@GSI3   = GSI3_FeedByUser
 
 # FEED — DynamoDB Query Samples (.http)
 
 ### 1) Get Post (STRONG)
-POST https://dynamodb.ap-south-1.amazonaws.com/
+POST https://dynamodb.{{REGION}}.amazonaws.com/
 X-Amz-Target: DynamoDB_20120810.GetItem
 Content-Type: application/x-amz-json-1.0
 
 {
-  "TableName": "PlaybookFeed",
-  "Key": {"PK": {"S": "POST#abc123"}, "SK": {"S": "META"}},
-  "ConsistentRead": true
+  "TableName": "{{TABLE}}",
+  "Key": {
+    "PK": {"S": "POST#abc123"},
+    "SK": {"S": "META"}
+  },
+  "ConsistentRead": true,
+  "ReturnConsumedCapacity": "TOTAL"
 }
 
 ### 2) Author timeline (GSI1)
-POST https://dynamodb.ap-south-1.amazonaws.com/
+POST https://dynamodb.{{REGION}}.amazonaws.com/
 X-Amz-Target: DynamoDB_20120810.Query
 Content-Type: application/x-amz-json-1.0
 
 {
-  "TableName": "PlaybookFeed",
-  "IndexName": "GSI1_PostsByAuthor",
+  "TableName": "{{TABLE}}",
+  "IndexName": "{{GSI1}}",
   "KeyConditionExpression": "GSI1PK = :a",
-  "ExpressionAttributeValues": {":a": {"S": "USER#U100"}},
+  "ExpressionAttributeValues": {
+    ":a": {"S": "USER#U100"}
+  },
   "ScanIndexForward": false,
-  "Limit": 50
+  "Limit": 50,
+  "ReturnConsumedCapacity": "TOTAL"
 }
 
-### 3) Posts by Tag (GSI2)
-POST https://dynamodb.ap-south-1.amazonaws.com/
+### 3) Posts by tag (GSI2)
+POST https://dynamodb.{{REGION}}.amazonaws.com/
 X-Amz-Target: DynamoDB_20120810.Query
 Content-Type: application/x-amz-json-1.0
 
 {
-  "TableName": "PlaybookFeed",
-  "IndexName": "GSI2_PostsByTag",
+  "TableName": "{{TABLE}}",
+  "IndexName": "{{GSI2}}",
   "KeyConditionExpression": "GSI2PK = :t",
-  "ExpressionAttributeValues": {":t": {"S": "TAG#dynamodb"}},
+  "ExpressionAttributeValues": {
+    ":t": {"S": "TAG#dynamodb"}
+  },
   "ScanIndexForward": false,
-  "Limit": 50
+  "Limit": 50,
+  "ReturnConsumedCapacity": "TOTAL"
 }
 
-### 4) Home Feed (GSI3)
-POST https://dynamodb.ap-south-1.amazonaws.com/
+### 4) Home feed (GSI3)
+POST https://dynamodb.{{REGION}}.amazonaws.com/
 X-Amz-Target: DynamoDB_20120810.Query
 Content-Type: application/x-amz-json-1.0
 
 {
-  "TableName": "PlaybookFeed",
-  "IndexName": "GSI3_FeedByUser",
+  "TableName": "{{TABLE}}",
+  "IndexName": "{{GSI3}}",
   "KeyConditionExpression": "GSI3PK = :u",
-  "ExpressionAttributeValues": {":u": {"S": "FEED#U400"}},
+  "ExpressionAttributeValues": {
+    ":u": {"S": "FEED#U400"}
+  },
   "ScanIndexForward": false,
-  "Limit": 50
+  "Limit": 50,
+  "ReturnConsumedCapacity": "TOTAL"
 }
 
-### 5) Idempotent Like (conditional Put)
-POST https://dynamodb.ap-south-1.amazonaws.com/
+### 5) Idempotent like (conditional Put)
+POST https://dynamodb.{{REGION}}.amazonaws.com/
 X-Amz-Target: DynamoDB_20120810.PutItem
 Content-Type: application/x-amz-json-1.0
 
 {
-  "TableName": "PlaybookFeed",
-  "Item": {"PK": {"S":"POST#abc123"}, "SK": {"S":"LIKE#U300"}, "created_at": {"S":"2025-11-04T09:06:00Z"}},
-  "ConditionExpression": "attribute_not_exists(PK) AND attribute_not_exists(SK)"
+  "TableName": "{{TABLE}}",
+  "Item": {
+    "PK": {"S": "POST#abc123"},
+    "SK": {"S": "LIKE#U300"},
+    "created_at": {"S": "2025-11-04T09:06:00Z"}
+  },
+  "ConditionExpression": "attribute_not_exists(PK) AND attribute_not_exists(SK)",
+  "ReturnConsumedCapacity": "TOTAL"
+}
+
+### 6) Pagination example (use LastEvaluatedKey from previous response)
+POST https://dynamodb.{{REGION}}.amazonaws.com/
+X-Amz-Target: DynamoDB_20120810.Query
+Content-Type: application/x-amz-json-1.0
+
+{
+  "TableName": "{{TABLE}}",
+  "IndexName": "{{GSI3}}",
+  "KeyConditionExpression": "GSI3PK = :u",
+  "ExpressionAttributeValues": {
+    ":u": {"S": "FEED#U400"}
+  },
+  "ScanIndexForward": false,
+  "Limit": 50,
+  "ExclusiveStartKey": {
+    "GSI3PK": {"S": "FEED#U400"},
+    "GSI3SK": {"S": "2025-11-04T09:00:00Z#01#POST#abc123"},
+    "PK":     {"S": "POST#abc123"},
+    "SK":     {"S": "META"}
+  },
+  "ReturnConsumedCapacity": "TOTAL"
 }

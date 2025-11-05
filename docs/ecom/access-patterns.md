@@ -14,8 +14,8 @@ title: E-commerce Access Patterns
 | ECOM-006 | PaymentSvc | Get Payments      | order_id  |                        | attempted_at DESC      | 5 | STRONG | 80 |
 | ECOM-007 | PaymentSvc | Find Pending      | status    |                        | attempted_at ASC       | 200 | EVENTUAL | 250 |
 | ECOM-008 | ShipmentSvc| Get Shipments     | order_id  |                        | updated_at DESC        | 5 | EVENTUAL | 120 |
-| ECOM-009 | Inventory  | Reserve/Decrement | product_id|                        |                        | 1 | STRONG | 60 |
+| ECOM-009 | Inventory  | Reserve/Decrement | product_id|                        |                        | 1 | WRITE | 60 |
 | ECOM-010 | Ops        | Orders Dashboard  | status    | carrier=…              | updated_at DESC        | 100 | EVENTUAL | 500 |
-| ECOM-011 | Archive    | Export Old Orders | placed_at<now-90d |                |                        | 1000 | EVENTUAL | n/a |
+| ECOM-011 | Archive    | Export Old Orders | placed_at<now-90d |                |                        | 1000 | OFFLINE | NA |
 
 > Tip: every row above should map to **Get/Query** on base table or the appropriate GSI. No `Scan` in hot paths.

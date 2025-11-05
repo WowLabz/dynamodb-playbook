@@ -1,0 +1,2 @@
+user_id,notif_id,type,ref,created_at,read
+U100,N1001,like,POST#abc123,2025-11-04T09:06:01Z,false

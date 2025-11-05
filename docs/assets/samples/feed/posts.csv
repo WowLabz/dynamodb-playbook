@@ -1,0 +1,2 @@
+post_id,author_id,created_at,visibility,media_ref,text
+abc123,U100,2025-11-04T09:00:00Z,public,,Hello DynamoDB!

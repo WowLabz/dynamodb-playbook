@@ -1,0 +1,85 @@
+flowchart TB
+  %% Styles
+  classDef base fill:#ecfdf5,stroke:#10b981,rx:6,ry:6,color:#064e3b;
+  classDef gsi  fill:#fff7ed,stroke:#fb923c,rx:6,ry:6,color:#7c2d12;
+  classDef item fill:#f8fafc,stroke:#94a3b8,rx:6,ry:6,color:#334155;
+  classDef rule fill:#eff6ff,stroke:#60a5fa,rx:6,ry:6,color:#0c4a6e;
+  classDef misc fill:#fefce8,stroke:#eab308,rx:6,ry:6,color:#713f12;
+
+  subgraph BASE["Base Table Keys"]
+    BPK["PK formats:
+• USER#<user_id>
+• ORDER#<order_id>
+• PRODUCT#<product_id>"]:::base
+    BSK["SK formats:
+• META
+• LINE#<0001..>
+• PAYMENT#<iso>
+• SHIPMENT#<iso>
+• INV#SNAP#<yyyy-mm-dd>"]:::base
+  end
+
+  subgraph GSIs["Global Secondary Indexes"]
+    G1["GSI1 OrdersByUser
+PK: USER#<user_id>
+SK: <ts>#ORDER#<order_id>  (DESC)"]:::gsi
+    G2["GSI2 OrdersByStatus
+PK: STATUS#<status>#<yyyy-mm>
+SK: <ts>#<shard>#ORDER#<order_id>  (DESC)"]:::gsi
+    G3["GSI_PAY PendingPayments (optional)
+PK: PAYSTATUS#<status>
+SK: <attempted_at>#ORDER#<order_id>"]:::gsi
+    G4["GSI_SHIP OpsSlice (optional)
+PK: SHIP#<status>#<carrier>#<yyyy-mm>
+SK: <updated_at>#ORDER#<id>"]:::gsi
+  end
+
+  subgraph ITEMS["Item Types & SK prefixes"]
+    IU["User
+PK=USER#id, SK=META"]:::item
+    IO["Order (meta)
+PK=ORDER#id, SK=META"]:::item
+    IL["OrderLine
+PK=ORDER#id, SK=LINE#<no>"]:::item
+    IP["Payment
+PK=ORDER#id, SK=PAYMENT#<iso>"]:::item
+    IS["Shipment
+PK=ORDER#id, SK=SHIPMENT#<iso>"]:::item
+    IV["Inventory Snapshot
+PK=PRODUCT#id, SK=INV#SNAP#<ymd>"]:::item
+  end
+
+  subgraph RULES["Write Rules / Idempotency / Optimistic Concurrency"]
+    R1["Create Order:
+PutItem IF attribute_not_exists(PK) AND attribute_not_exists(SK)"]:::rule
+    R2["Add Line:
+PutItem IF attribute_not_exists(SK) (idempotent line_no)"]:::rule
+    R3["Authorize Payment:
+PutItem IF attribute_not_exists(SK) (idempotent by timestamp/id)"]:::rule
+    R4["Inventory Decrement:
+Update SET available = available - :q
+IF available >= :q"]:::rule
+    R5["Shipment Update:
+Update with version/etag OR condition on current status"]:::rule
+  end
+
+  subgraph MISC["TTL / Streams / Size / Projection"]
+    T1["TTL (optional):
+• old snapshots
+• temp reservations (hold TTL)"]:::misc
+    T2["Streams:
+• Project events → outbox/bus
+• Build GSI_PAY / metrics
+• Backfill sinks"]:::misc
+    T3["Item size:
+• keep < 400KB
+• denormalize only hot attrs"]:::misc
+    T4["Projection:
+• GSIs = keys + minimal INCLUDE"]:::misc
+  end
+
+  %% Link the sections
+  BPK --> BSK
+  GSIs --> ITEMS
+  ITEMS --> RULES
+  RULES --> MISC

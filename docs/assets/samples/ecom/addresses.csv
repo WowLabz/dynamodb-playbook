@@ -1,0 +1,2 @@
+user_id,address_id,line1,line2,city,state,postal_code,country,is_default,updated_at
+U100,ADDR1,12 MG Rd,,Bengaluru,KA,560001,IN,true,2025-11-05T08:00:00Z

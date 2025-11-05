@@ -1,0 +1,7 @@
+timeline
+  title Schema Evolution (Blue/Green Read Path)
+  2025-10-01 : Design new shape + feature flags
+  2025-10-10 : Dual-write old+new
+  2025-10-20 : Backfill historical data
+  2025-10-25 : Flip reads to new path (canary -> 100%)
+  2025-11-05 : Remove old writes (after bake time)

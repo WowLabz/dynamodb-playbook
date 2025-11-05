@@ -1,0 +1,21 @@
+flowchart LR
+  classDef base fill:#ecfdf5,stroke:#10b981,rx:6,ry:6;
+  classDef lsi fill:#f5f3ff,stroke:#8b5cf6,rx:6,ry:6;
+  classDef gsi fill:#fff7ed,stroke:#fb923c,rx:6,ry:6;
+
+  subgraph Base["Base Table (PK, SK)"]
+    BPK[PK]:::base
+    BSK[SK]:::base
+  end
+
+  subgraph LSI["Local Secondary Index (same PK, different SK)"]
+    LPK[PK]:::lsi
+    LSK[SK']:::lsi
+    note1["Strongly consistent reads; 10GB per item-collection applies"]:::lsi
+  end
+
+  subgraph GSI["Global Secondary Index (new PK, new SK)"]
+    GPK[PK']:::gsi
+    GSK[SK']:::gsi
+    note2["Eventually consistent; capacity decoupled; projection controls cost"]:::gsi
+  end

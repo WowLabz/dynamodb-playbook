@@ -1,0 +1,4 @@
+user_id,email,full_name,created_at,handle
+U100,author@example.com,Author One,2023-06-01T10:00:00Z,author1
+U300,liker@example.com,Liker,2024-02-15T12:00:00Z,likeguy
+U400,follower@example.com,Follower,2024-03-10T08:00:00Z,followme

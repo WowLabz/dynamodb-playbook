@@ -1,0 +1,2 @@
+event_id,aggregate_id,aggregate_type,event_type,payload_json,occurred_at,published_at
+EVT-1001,ORDER#12345,order,ORDER_PLACED,"{""order_id"":""12345""}",2025-11-04T10:00:00Z,

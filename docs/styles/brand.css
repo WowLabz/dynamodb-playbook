@@ -1,0 +1,26 @@
+/* Wow Labz – light/dark brand tuning for Material */
+:root {
+  /* Light */
+  --md-primary-fg-color: #5b6cff;      /* Wow-ish electric indigo (tweak if you have brand hex) */
+  --md-accent-fg-color:  #00c2a8;      /* Teal accent */
+  --md-typeset-a-color:  var(--md-primary-fg-color);
+}
+
+[data-md-color-scheme="slate"] {
+  /* Dark */
+  --md-primary-fg-color: #7b88ff;
+  --md-accent-fg-color:  #19e6cb;
+  --md-typeset-a-color:  var(--md-accent-fg-color);
+}
+
+/* Logo sizing in header */
+.md-header__button.md-logo img,
+.md-header__button.md-logo svg {
+  height: 1.4rem;
+}
+
+/* Footer text */
+.wl-footer {
+  opacity: .8;
+  font-size: .8rem;
+}

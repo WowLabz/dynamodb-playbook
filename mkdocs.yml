@@ -1,0 +1,94 @@
+site_name: DynamoDB Developer Playbook — Wow Labz
+site_description: Professional playbook with concepts, diagrams, queries, and production checklists
+site_url: https://wowlabz.github.io/dynamodb-playbook
+repo_url: https://github.com/wowlabz/dynamodb-playbook
+repo_name: wowlabz/dynamodb-playbook
+
+docs_dir: docs
+
+theme:
+  name: material
+  logo: assets/branding/wowlabz-logo.svg         # add this file (see below)
+  favicon: assets/branding/favicon.png           # add this file (see below)
+  custom_dir: docs/overrides                     # enables footer override
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - toc.integrate
+    - content.code.copy
+    - content.tabs.link
+    - content.action.edit
+  icon:
+    repo: fontawesome/brands/github
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+      # Use CSS vars in brand.css for colors (cleaner than hardcoding here)
+    - scheme: slate
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+extra:
+  social:
+    - icon: fontawesome/brands/linkedin
+      link: https://www.linkedin.com/company/wow-labz/
+    - icon: fontawesome/brands/x-twitter
+      link: https://x.com/wowlabz
+  consent:
+    title: Cookie consent
+    description: >-
+      We use anonymous analytics to understand how the playbook is used.
+
+extra_css:
+  - styles/brand.css
+
+extra_javascript:
+  # Mermaid for diagrams in ```mermaid fences
+  - https://unpkg.com/mermaid@10/dist/mermaid.min.js
+  - js/mermaid-init.js
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.superfences
+  - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+
+plugins:
+  - search
+  - git-revision-date-localized:
+      type: date
+      enable_creation_date: true
+
+nav:
+  - Home: index.md
+  - Concepts & Structure: concepts.md
+  - E-commerce:
+      - Overview: ecom/index.md
+      - Access Patterns: ecom/access-patterns.md
+      - Diagrams: ecom/diagrams.md
+      - Queries: ecom/queries.md
+  - Social / Activity Feed:
+      - Overview: feed/index.md
+      - Access Patterns: feed/access-patterns.md
+      - Diagrams: feed/diagrams.md
+      - Queries: feed/queries.md
+  - Production Checklists: checklists/index.md
+  - Downloads: downloads.md

@@ -21,6 +21,25 @@
 
 /* Footer text */
 .wl-footer {
-  opacity: .8;
-  font-size: .8rem;
+  background: var(--md-default-bg-color);
+  border-top: 1px solid var(--md-default-fg-color--lightest);
+  text-align: center;
+  font-size: 0.5rem;
+  padding: 0.5rem 0.5rem;
+  color: var(--md-default-fg-color);
+}
+
+
+/* Make footer links subtle */
+.wl-footer a {
+  text-decoration: none;
+  border-bottom: 0.5px dotted currentColor;
+}
+
+@media (prefers-color-scheme: dark) {
+  .wl-footer {
+    background: var(--md-default-bg-color);
+    border-top-color: var(--md-default-fg-color--lighter);
+    color: var(--md-default-fg-color);
+  }
 }

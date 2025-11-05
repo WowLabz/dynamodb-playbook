@@ -12,15 +12,12 @@ This playbook blends **principles**, **repeatable workflows**, and **copy-pastea
 
 ## Quick Nav
 - **[Concepts & Structure](concepts.md)**
-- **Examples**
-  - **[E-commerce](ecom/index.md)**
-  - **[Social/Activity Feed](feed/index.md)**
 - **[Production Checklists](checklists/index.md)**
 - **[Raw Assets & Downloads](downloads.md)**
 
-## Examples
 
-<div class="grid cards">
+## Examples
+<div class="grid cards" markdown>
 - :material-cart: **E-commerce**  
   Access patterns, entity modeling, and queries.  
   [:octicons-arrow-right-24: Open](ecom/index.md)

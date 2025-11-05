@@ -92,11 +92,13 @@ nav:
   - Concepts & Structure: concepts.md
   - E-commerce:
       - Overview: ecom/index.md
+      - Samples: ecom/samples.md
       - Access Patterns: ecom/access-patterns.md
       - Diagrams: ecom/diagrams.md
       - Queries: ecom/queries.md
   - Social / Activity Feed:
       - Overview: feed/index.md
+      - Samples: feed/samples.md
       - Access Patterns: feed/access-patterns.md
       - Diagrams: feed/diagrams.md
       - Queries: feed/queries.md

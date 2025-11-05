@@ -5,7 +5,10 @@ description: Professional playbook with patterns, diagrams, queries, and product
 
 # DynamoDB Developer Playbook
 
-This site hosts a working playbook with two end-to-end examples (**E-commerce** and **Social/Activity Feed**), shared diagrams, queries, and production checklists.
+A practical, production-grade guide to data modeling and operations on **Amazon DynamoDB**.  
+This playbook blends **principles**, **repeatable workflows**, and **copy-pasteable assets** (diagrams, queries, checklists).
+
+> Start with **Concepts**, then dive into the examples, and finally run the **Production Checklists** before launch.
 
 ## Quick Nav
 - **[Concepts & Structure](concepts.md)**
@@ -15,6 +18,11 @@ This site hosts a working playbook with two end-to-end examples (**E-commerce** 
 - **[Production Checklists](checklists/index.md)**
 - **[Raw Assets & Downloads](downloads.md)**
 
-## GitHub Pages
-1. Push the `docs/` folder to your repo.
-2. Settings → Pages → Source: Branch = `main`, Folder = `/docs`.
+---
+
+## How to use this playbook
+1. **List access patterns** and SLAs. Model keys first (PK/SK), keep keys generic (`PK`, `SK`) and *decorate values* (`ORDER#123`, `USER#42`).
+2. **Validate each hot path** is a Get/Query (no Scan). Add LSIs/GSIs only when required.
+3. **Prototype** items and **exercise queries** (copy the HTTP payloads).
+4. **Run the checklists** (design, DR, security/IAM, cost/alarms, ops, migration) before shipping.
+

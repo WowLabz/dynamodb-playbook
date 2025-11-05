@@ -4,6 +4,115 @@ title: E-commerce Queries
 
 # E-commerce Queries
 
-```http
 
+SigV4-compatible HTTP payloads (can be pasted into a REST client that signs with AWS4).  
+**Parameters used:** `REGION=ap-south-1`, `TABLE=PlaybookEcom`, `GSI1=GSI1_OrdersByUser`, `GSI2=GSI2_OrdersByStatus`.
+
+
+### 1) Get User by id (STRONG)
+```http
+POST https://dynamodb.ap-south-1.amazonaws.com/
+X-Amz-Target: DynamoDB_20120810.GetItem
+Content-Type: application/x-amz-json-1.0
+
+{
+  "TableName": "PlaybookEcom",
+  "Key": {
+    "PK": {"S": "USER#U100"},
+    "SK": {"S": "META"}
+  },
+  "ConsistentRead": true
+}
+```
+
+### 2) Get Order (STRONG)
+```http
+POST https://dynamodb.ap-south-1.amazonaws.com/
+X-Amz-Target: DynamoDB_20120810.GetItem
+Content-Type: application/x-amz-json-1.0
+
+{
+  "TableName": "PlaybookEcom",
+  "Key": {
+    "PK": {"S": "ORDER#12345"},
+    "SK": {"S": "META"}
+  },
+  "ConsistentRead": true
+}
+```
+
+### 3) Orders by User (GSI1), recent-first
+```http
+POST https://dynamodb.ap-south-1.amazonaws.com/
+X-Amz-Target: DynamoDB_20120810.Query
+Content-Type: application/x-amz-json-1.0
+
+{
+  "TableName": "PlaybookEcom",
+  "IndexName": "GSI1_OrdersByUser",
+  "KeyConditionExpression": "GSI1PK = :u AND begins_with(GSI1SK, :tsPrefix)",
+  "ExpressionAttributeValues": {
+    ":u": {"S": "USER#U100"},
+    ":tsPrefix": {"S": "2025-"}
+  },
+  "ScanIndexForward": false,
+  "Limit": 25
+}
+```
+
+### 4) Backoffice Orders by Status/Month (GSI2)
+```http
+POST https://dynamodb.ap-south-1.amazonaws.com/
+X-Amz-Target: DynamoDB_20120810.Query
+Content-Type: application/x-amz-json-1.0
+
+{
+  "TableName": "PlaybookEcom",
+  "IndexName": "GSI2_OrdersByStatus",
+  "KeyConditionExpression": "GSI2PK = :pk",
+  "ExpressionAttributeValues": {
+    ":pk": {"S": "STATUS#Shipped#2025-11"}
+  },
+  "ScanIndexForward": false,
+  "Limit": 200
+}
+```
+
+### 5) Conditional inventory decrement
+```http
+POST https://dynamodb.ap-south-1.amazonaws.com/
+X-Amz-Target: DynamoDB_20120810.UpdateItem
+Content-Type: application/x-amz-json-1.0
+
+{
+  "TableName": "PlaybookEcom",
+  "Key": {
+    "PK": {"S": "PRODUCT#P-RED-TSHIRT"},
+    "SK": {"S": "META"}
+  },
+  "UpdateExpression": "SET available = available - :q",
+  "ConditionExpression": "available >= :q",
+  "ExpressionAttributeValues": {
+    ":q": {"N": "1"}
+  },
+  "ReturnValues": "ALL_NEW"
+}
+```
+
+### 6) Idempotent payment authorization
+```http
+POST https://dynamodb.ap-south-1.amazonaws.com/
+X-Amz-Target: DynamoDB_20120810.PutItem
+Content-Type: application/x-amz-json-1.0
+
+{
+  "TableName": "PlaybookEcom",
+  "Item": {
+    "PK": {"S":"ORDER#12345"},
+    "SK": {"S":"PAYMENT#2025-11-04T10:00:05Z"},
+    "status": {"S":"Authorized"},
+    "amount_cents": {"N":"12999"}
+  },
+  "ConditionExpression": "attribute_not_exists(PK) AND attribute_not_exists(SK)"
+}
 ```

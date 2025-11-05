@@ -4,7 +4,17 @@ title: E-commerce Overview
 
 # E-commerce Overview
 
-- Indexes: OrdersByUser (GSI1), OrdersByStatus (GSI2 with shard).
-- Streams for side-effects: Payments/Shipments/Reporting.
+**Scope:** Users, Orders, OrderLines, Payments, Shipments, Inventory, Outbox.
 
-**Dive in:** [Access Patterns](access-patterns.md) · [Diagrams](diagrams.md) · [Queries](queries.md)
+## Access Patterns (representative)
+- Get User; list user’s recent Orders (**GSI: OrdersByUser**)
+- Get Order (META) + lines/payments/shipments (by `PK`)
+- Backoffice list of Orders by Status/Month (**GSI: OrdersByStatus** with shard in `SK`)
+- Reserve/decrement inventory with **conditional updates**
+- Soft delete & export older Orders for analytics/compliance
+
+## Index Strategy
+- **GSI1 — OrdersByUser**: `PK = USER#<id>`, `SK = <placed_at>#ORDER#<id>` (DESC)
+- **GSI2 — OrdersByStatus**: `PK = STATUS#<status>#<yyyy-mm>`, `SK = <placed_at>#<shard>#ORDER#<id>` (DESC)
+
+**Continue:** [Access Patterns](access-patterns.md) · [Diagrams](diagrams.md) · [Queries](queries.md)

@@ -4,4 +4,18 @@ title: E-commerce Access Patterns
 
 # E-commerce Access Patterns
 
-_No data_
+| story_id | consumer   | verb              | by        | filter                 | order                  | limit | consistency | SLA_ms |
+|---|---|---|---|---|---|---:|---|---:|
+| ECOM-001 | UserSvc    | Get User          | user_id   |                        |                        | 1 | STRONG | 50 |
+| ECOM-002 | OrderSvc   | List Orders       | user_id   |                        | placed_at DESC         | 25 | EVENTUAL | 100 |
+| ECOM-003 | OrderSvc   | Get Order         | order_id  |                        |                        | 1 | STRONG | 50 |
+| ECOM-004 | OrderSvc   | List OrderLines   | order_id  |                        | line_no ASC            | 200 | EVENTUAL | 150 |
+| ECOM-005 | Backoffice | List Orders       | status    | date_bucket=yyyy-mm    | placed_at DESC         | 200 | EVENTUAL | 250 |
+| ECOM-006 | PaymentSvc | Get Payments      | order_id  |                        | attempted_at DESC      | 5 | STRONG | 80 |
+| ECOM-007 | PaymentSvc | Find Pending      | status    |                        | attempted_at ASC       | 200 | EVENTUAL | 250 |
+| ECOM-008 | ShipmentSvc| Get Shipments     | order_id  |                        | updated_at DESC        | 5 | EVENTUAL | 120 |
+| ECOM-009 | Inventory  | Reserve/Decrement | product_id|                        |                        | 1 | STRONG | 60 |
+| ECOM-010 | Ops        | Orders Dashboard  | status    | carrier=…              | updated_at DESC        | 100 | EVENTUAL | 500 |
+| ECOM-011 | Archive    | Export Old Orders | placed_at<now-90d |                |                        | 1000 | EVENTUAL | n/a |
+
+> Tip: every row above should map to **Get/Query** on base table or the appropriate GSI. No `Scan` in hot paths.

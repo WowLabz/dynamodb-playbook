@@ -25,15 +25,12 @@ If a folder is missing in your repo, create it and copy files from your working 
 
 ## Diagrams
 
-> These will light up as you add files. Link individual images when available.
 
-| Topic | Folder |
+| Topic | Go |
 |---|---|
-| E-commerce | `assets/diagrams/ecom/` |
-| Social / Activity Feed | `assets/diagrams/feed/` |
-| Shared | `assets/diagrams/shared/` |
+| E-commerce | [Open Diagrams](ecom/diagrams/) |
+| Social / Activity Feed | [Open Diagrams](feed/diagrams/) |
 
-*(When diagrams are added, link them explicitly, e.g. `assets/diagrams/ecom/data-model.svg`.)*
 
 ## Production Checklists
 

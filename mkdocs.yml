@@ -92,3 +92,6 @@ nav:
       - Queries: feed/queries.md
   - Production Checklists: checklists/index.md
   - Downloads: downloads.md
+
+extra:
+  current_year: 2025

@@ -95,3 +95,6 @@ nav:
 
 extra:
   current_year: 2025
+
+extra_css:
+  - assets/overrides.css

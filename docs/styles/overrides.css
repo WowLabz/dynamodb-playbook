@@ -1,0 +1,23 @@
+/* Footer block */
+.md-footer .wl-footer {
+  background: var(--md-default-bg-color);
+  border-top: 1px solid var(--md-default-fg-color--lightest);
+  text-align: center;
+  font-size: 0.82rem;
+  padding: 0.75rem 0.5rem;
+  color: var(--md-default-fg-color);
+}
+
+/* Make footer links subtle */
+.md-footer .wl-footer a {
+  text-decoration: none;
+  border-bottom: 1px dotted currentColor;
+}
+
+@media (prefers-color-scheme: dark) {
+  .md-footer .wl-footer {
+    background: var(--md-default-bg-color);
+    border-top-color: var(--md-default-fg-color--lighter);
+    color: var(--md-default-fg-color);
+  }
+}

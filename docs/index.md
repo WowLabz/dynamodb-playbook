@@ -18,6 +18,19 @@ This playbook blends **principles**, **repeatable workflows**, and **copy-pastea
 - **[Production Checklists](checklists/index.md)**
 - **[Raw Assets & Downloads](downloads.md)**
 
+## Examples
+
+<div class="grid cards">
+- :material-cart: **E-commerce**  
+  Access patterns, entity modeling, and queries.  
+  [:octicons-arrow-right-24: Open](ecom/index.md)
+
+- :material-forum: **Social / Activity Feed**  
+  Fan-out, timelines, and write patterns.  
+  [:octicons-arrow-right-24: Open](feed/index.md)
+</div>
+
+
 ---
 
 ## How to use this playbook

@@ -1,0 +1,24 @@
+flowchart TB
+  %% A5 Write Sharding: ORDER_STATUS#<status>#<yyyy-mm>#<shard>
+  classDef idx fill:#f5f3ff,stroke:#8b5cf6,rx:6,ry:6;
+  classDef step fill:#ffffff,stroke:#94a3b8,rx:6,ry:6;
+  classDef note fill:#ecfeff,stroke:#06b6d4,rx:6,ry:6;
+
+  subgraph Client["Client / Order Service"]
+    direction TB
+    s1["On order status change"]:::step
+    s2["Compute shard = hash(order_id) % N"]:::step
+    s3["Compose GSI2PK = STATUS#<status>#<yyyy-mm>"]:::step
+    s4["Compose GSI2SK = <placed_at>#<shard>#ORDER#<id>"]:::step
+  end
+
+  subgraph DDB["DynamoDB Index: GSI2 OrdersByStatus"]
+    direction TB
+    pk1[("PK = STATUS#Shipped#2025-11")]:::idx
+    skex["SK = <placed_at>#<shard>#ORDER#<id>"]:::idx
+  end
+
+  q1(["Backoffice Query: \n PK=STATUS#<status>#<yyyy-mm> \n order by SK DESC \n page by Limit"]):::note
+
+  s1 --> s2 --> s3 --> s4 --> pk1
+  q1 --> pk1

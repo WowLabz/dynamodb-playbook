@@ -1,0 +1,12 @@
+flowchart LR
+  %% A6 Streams Pipeline: DDB → Lambda → Payments/Shipments/Reporting
+  classDef ddb fill:#ecfdf5,stroke:#10b981,rx:6,ry:6;
+  classDef lam fill:#f0f9ff,stroke:#0ea5e9,rx:6,ry:6;
+  classDef sink fill:#fff7ed,stroke:#fb923c,rx:6,ry:6;
+  classDef guard fill:#fef2f2,stroke:#ef4444,rx:6,ry:6;
+
+  T["Orders Table mutations"]:::ddb --> S["DynamoDB Streams"]:::ddb --> L["Lambda Consumer (Idempotent)"]:::lam
+  L --> G1["Payments Service"]
+  L --> G2["Shipments Service"]
+  L --> G3["Reporting (S3/Parquet via Firehose)"]
+  L -. on failure .-> DLQ["DLQ"]:::guard

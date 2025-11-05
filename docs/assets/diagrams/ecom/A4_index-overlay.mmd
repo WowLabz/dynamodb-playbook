@@ -1,0 +1,23 @@
+flowchart LR
+  %% A4 Index Overlay: Base + GSI1 OrdersByUser, GSI2 OrdersByStatus
+  classDef table fill:#ecfdf5,stroke:#10b981,rx:6,ry:6;
+  classDef index fill:#f5f3ff,stroke:#8b5cf6,rx:6,ry:6;
+  classDef proj fill:#ffffff,stroke:#94a3b8,rx:6,ry:6;
+
+  subgraph BaseTable["Base Table"]
+    BT_PK[("PK = ORDER#<id>")]:::table
+    BT_SK[("SK = <variant> META/LINE#/PAYMENT#")]:::table
+    BT_ATTRS["Attrs: user_id, status, placed_at, total_cents, ..."]:::proj
+  end
+
+  subgraph GSI1["GSI1: OrdersByUser (PK=user_id, SK=placed_at DESC)"]
+    G1_PK[("PK = USER#<id>")]:::index
+    G1_SK[("SK = <placed_at>#ORDER#<id>")]:::index
+    G1_PROJ["Projection: KEYS_ONLY or INCLUDE {status,total_cents}"]:::proj
+  end
+
+  subgraph GSI2["GSI2: OrdersByStatus (PK=status#yyyy-mm, SK=placed_at DESC)"]
+    G2_PK[("PK = STATUS#<status>#<yyyy-mm>")]:::index
+    G2_SK[("SK = <placed_at>#<shard>#ORDER#<id>")]:::index
+    G2_PROJ["Projection: INCLUDE {user_id,total_cents}"]:::proj
+  end

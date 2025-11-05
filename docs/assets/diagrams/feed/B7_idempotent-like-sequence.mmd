@@ -1,0 +1,19 @@
+sequenceDiagram
+  autonumber
+  participant C as Client App
+  participant API as Engage API
+  participant DDB as DynamoDB
+  participant STR as Streams
+  participant L as Lambda (Counters)
+
+  C->>API: POST /posts/{id}/like (Idempotency-Key)
+  API->>DDB: PutItem LIKE#<user> (Condition: not exists)
+  alt First like
+    DDB-->>API: OK
+    DDB-->>STR: INSERT
+    STR-->>L: Batch
+    L->>DDB: Update post likes counter (SET likes = if_not_exists(likes,0)+1)
+  else Duplicate like
+    DDB-->>API: ConditionalCheckFailed
+    API-->>C: 200 OK (idempotent)
+  end

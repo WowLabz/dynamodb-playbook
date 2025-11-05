@@ -1,0 +1,22 @@
+flowchart TB
+  %% B5 Sharded Feeds: write-time fanout with shard
+  classDef svc fill:#f0f9ff,stroke:#0ea5e9,rx:6,ry:6;
+  classDef idx fill:#f5f3ff,stroke:#8b5cf6,rx:6,ry:6;
+  classDef note fill:#ecfeff,stroke:#06b6d4,rx:6,ry:6;
+
+  subgraph PostSvc["Post Service"]
+    p1["New post created"]:::svc
+    p2["Resolve followers (bounded)"]:::svc
+    p3["For each follower: shard = hash(post_id+follower_id)%N"]:::svc
+    p4["Write to GSI3: PK=FEED#<follower>, SK=<ts>#<shard>#POST#<id>"]:::svc
+  end
+
+  subgraph DDB["GSI3 FeedByUser"]
+    pkA[("PK = FEED#U001")]:::idx
+    sk["SK = <ts>#<shard>#POST#<id> DESC"]:::idx
+  end
+
+  q1(["Query: PK=FEED#<user> order by SK DESC limit 50"]):::note
+
+  p1 --> p2 --> p3 --> p4 --> pkA
+  q1 --> pkA

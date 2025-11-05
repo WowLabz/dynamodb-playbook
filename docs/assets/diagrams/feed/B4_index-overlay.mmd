@@ -1,0 +1,17 @@
+flowchart LR
+  %% B4 Index Overlay: GSI1 PostsByAuthor, GSI2 PostsByTag, GSI3 FeedByUser
+  classDef index fill:#f5f3ff,stroke:#8b5cf6,rx:6,ry:6;
+  classDef proj  fill:#ffffff,stroke:#94a3b8,rx:6,ry:6;
+
+  subgraph GSI1["PostsByAuthor (PK=author, SK=ts DESC)"]
+    P1_PK[("PK = USER#<author_id>")]:::index
+    P1_SK[("SK = <ts>#POST#<id>")]:::index
+  end
+  subgraph GSI2["PostsByTag (PK=tag, SK=ts DESC)"]
+    T_PK[("PK = TAG#<tag>")]:::index
+    T_SK[("SK = <ts>#POST#<id>")]:::index
+  end
+  subgraph GSI3["FeedByUser (PK=user, SK=ts#shard#POST#id)"]
+    F_PK[("PK = FEED#<user_id>")]:::index
+    F_SK[("SK = <ts>#<shard>#POST#<id>")]:::index
+  end

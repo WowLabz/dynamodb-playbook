@@ -1,0 +1,27 @@
+sequenceDiagram
+  autonumber
+  participant C as Client
+  participant API as Orders API
+  participant DDB as DynamoDB
+  participant STR as Streams
+  participant L as Lambda
+  participant PAY as PaymentSvc
+  participant INV as InventorySvc
+  participant DLQ as DLQ
+
+  C->>API: POST /orders/{id}/authorize-payment (Idempotency-Key)
+  API->>DDB: PutItem PAYMENT#<ts> (Condition: not exists)
+  alt First attempt
+    DDB-->>API: OK
+    API-->>C: 200 Accepted
+    DDB-->>STR: INSERT
+    STR-->>L: Batch event
+    par Side-effects
+      L->>PAY: Authorize capture (idempotent token)
+      L->>INV: Reserve inventory (Condition: available >= :q)
+    end
+  else Duplicate
+    DDB-->>API: ConditionalCheckFailed
+    API-->>C: 200 (idempotent reuse)
+  end
+  L -. failure .-> DLQ: poison-pill isolation

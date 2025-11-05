@@ -10,18 +10,18 @@ If a folder is missing in your repo, create it and copy files from your working 
 ## Samples
 
 ### E-commerce
-| File | Description | Preview/Download |
+| File | Description | Download |
 |---|---|---|
-| `access_patterns.csv` | Canonical access patterns for the e-commerce example. | [Preview/Download](assets/samples/ecom/access_patterns.csv) |
-| `queries.http` | Copy-pasteable HTTP requests (GET/Query/Batch, etc.). | [Preview/Download](assets/samples/ecom/queries.http) |
-| `seed.jsonl` | Seed data (JSON Lines) for quick prototyping. | [Preview/Download](assets/samples/ecom/seed.jsonl) |
+| `access_patterns.csv` | Canonical access patterns for the e-commerce example. | [Download](assets/samples/ecom/access_patterns.csv) |
+| `queries.http` | Copy-pasteable HTTP requests (GET/Query/Batch, etc.). | [Download](assets/samples/ecom/queries.http) |
+| `seed.jsonl` | Seed data (JSON Lines) for quick prototyping. | [Download](assets/samples/ecom/seed.jsonl) |
 
 ### Social / Activity Feed
-| File | Description | Preview/Download |
+| File | Description | Download |
 |---|---|---|
-| `access_patterns.csv` | Access patterns for timelines, fan-out, etc. | [Preview/Download](assets/samples/feed/access_patterns.csv) |
-| `queries.http` | HTTP queries for feed write/read paths. | [Preview/Download](assets/samples/feed/queries.http) |
-| `seed.jsonl` | Seed data for users, posts, timelines. | [Preview/Download](assets/samples/feed/seed.jsonl) |
+| `access_patterns.csv` | Access patterns for timelines, fan-out, etc. | [Download](assets/samples/feed/access_patterns.csv) |
+| `queries.http` | HTTP queries for feed write/read paths. | [Download](assets/samples/feed/queries.http) |
+| `seed.jsonl` | Seed data for users, posts, timelines. | [Download](assets/samples/feed/seed.jsonl) |
 
 ## Diagrams
 
@@ -37,12 +37,12 @@ If a folder is missing in your repo, create it and copy files from your working 
 
 ## Production Checklists
 
-| Checklist | Preview/Download |
+| Checklist | View |
 |---|---|
-| Design Review | [Preview/Download](assets/checklists/design-review.md) |
-| DR & Backup | [Preview/Download](assets/checklists/dr-backup.md) |
-| Security & IAM | [Preview/Download](assets/checklists/security-iam.md) |
-| Observability & Ops | [Preview/Download](assets/checklists/observability-ops.md) |
-| Cost Alarms | [Preview/Download](assets/checklists/cost-alarms.md) |
-| Readiness Sign-off | [Preview/Download](assets/checklists/readiness-signoff.md) |
-| Data Migration & Evolution | [Preview/Download](assets/checklists/data-migration-evolution.md) |
+| Design Review | [View](assets/checklists/design-review.md) |
+| DR & Backup | [View](assets/checklists/dr-backup.md) |
+| Security & IAM | [View](assets/checklists/security-iam.md) |
+| Observability & Ops | [View](assets/checklists/observability-ops.md) |
+| Cost Alarms | [View](assets/checklists/cost-alarms.md) |
+| Readiness Sign-off | [View](assets/checklists/readiness-signoff.md) |
+| Data Migration & Evolution | [View](assets/checklists/data-migration-evolution.md) |

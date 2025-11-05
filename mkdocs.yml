@@ -1,4 +1,4 @@
-site_name: DynamoDB Developer Playbook — Wow Labz
+site_name: DynamoDB Developer Playbook
 site_description: Professional playbook with concepts, diagrams, queries, and production checklists
 site_url: https://wowlabz.github.io/dynamodb-playbook
 repo_url: https://github.com/wowlabz/dynamodb-playbook
@@ -50,10 +50,6 @@ extra_css:
   - styles/brand.css
   # - styles/overrides.css
 
-extra_javascript:
-  # Mermaid for diagrams in ```mermaid fences
-  - https://unpkg.com/mermaid@10/dist/mermaid.min.js
-  - js/mermaid-init.js
 
 markdown_extensions:
   - admonition
@@ -62,17 +58,28 @@ markdown_extensions:
   - footnotes
   - md_in_html
   - tables
+  - pymdownx.details
+  - pymdownx.snippets:
+      base_path: docs        # resolve paths from docs/
+      check_paths: true      # log when a path can't be found
+  - pymdownx.highlight
   - toc:
       permalink: true
       toc_depth: 3
-  - pymdownx.superfences
-  - pymdownx.details
-  - pymdownx.snippets
   - pymdownx.tabbed:
       alternate_style: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+extra_javascript:
+  - https://unpkg.com/mermaid@10/dist/mermaid.min.js
+  - js/mermaid-init.js
 
 plugins:
   - search
@@ -99,12 +106,3 @@ nav:
 extra:
   current_year: 2025
 
-markdown_extensions:
-  - admonition
-  - pymdownx.details
-  - pymdownx.superfences
-  - attr_list
-  - md_in_html
-  - pymdownx.emoji:
-      emoji_index: !!python/name:material.extensions.emoji.twemoji
-      emoji_generator: !!python/name:material.extensions.emoji.to_svg

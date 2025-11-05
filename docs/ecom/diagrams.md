@@ -5,37 +5,27 @@ title: E-commerce Diagrams
 # E-commerce Diagrams
 
 ### A3 ITEM-COLLECTION-ORDER
-_Missing diagram_
+```mermaid
+--8<-- "assets/diagrams/ecom/A3_item-collection-order.mmd"
+```
+<!-- <small>Source: <a href="../../assets/diagrams/ecom/A4_index-overlay.mmd">A4_index-overlay.mmd</a></small> -->
+
 
 ### A4 INDEX-OVERLAY
-_Missing diagram_
+```mermaid
+--8<-- "assets/diagrams/ecom/A4_index-overlay.mmd"
+```
 
 ### A5 WRITE-SHARDING
-_Missing diagram_
-
+```mermaid
+--8<-- "assets/diagrams/ecom/A5_write-sharding.mmd"
+```
 ### A6 STREAMS-PIPELINE
-_Missing diagram_
+```mermaid
+--8<-- "assets/diagrams/ecom/A6_streams-pipeline.mmd"
+```
 
 ### A7 IDEMPOTENCY-SEQUENCE
-_Missing diagram_
-
-
-### Item Collection — ORDER
 ```mermaid
-flowchart TB
-  %% A3 Item Collection: PK=ORDER#<id>
-  classDef head fill:#eef5ff,stroke:#5b8def,stroke-width:1px,rx:6,ry:6;
-  classDef item fill:#ffffff,stroke:#94a3b8,rx:6,ry:6;
-  classDef rel  fill:#fef9c3,stroke:#f59e0b,rx:6,ry:6;
-
-  subgraph PK["PK = ORDER#12345"]
-    direction TB
-    META["SK = META  \\n {order_id,status,placed_at,total_cents,...}"]:::head
-    L1["SK = LINE#0001 \\n {product_id,qty,price_cents}"]:::item
-    L2["SK = LINE#0002 \\n {product_id,qty,price_cents}"]:::item
-    PAY1["SK = PAYMENT#2025-11-01T10:00Z \\n {status,amount_cents,method}"]:::rel
-    SHIP1["SK = SHIPMENT#2025-11-02T06:00Z \\n {carrier,tracking_no,status}"]:::rel
-    EVT1["SK = EVENT#ORDER_PLACED#2025-11-01T10:00Z"]:::rel
-    EVT2["SK = EVENT#PAYMENT_AUTH#2025-11-01T10:02Z"]:::rel
-  end
+--8<-- "assets/diagrams/ecom/A7_idempotency-sequence.mmd"
 ```
